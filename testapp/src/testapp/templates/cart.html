@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px; color: #333;">Shopping Cart</h2>
+<div id="alert"></div>
+<div class="form-group">
+    <label>View Cart by ID (IDOR Test)</label>
+    <input type="text" id="cartId" placeholder="Enter cart ID (default: your own)" style="width: 200px; display: inline-block; margin-right: 10px;">
+    <button class="btn" onclick="loadCart()" style="width: auto; display: inline-block; padding: 12px 20px;">Load Cart</button>
+</div>
+<div class="form-group" style="margin-top: 30px;">
+    <h3 style="margin-bottom: 15px;">Add Item to Cart</h3>
+    <input type="text" id="productName" placeholder="Product name" style="width: 200px; display: inline-block; margin-right: 10px;">
+    <input type="number" id="productQty" placeholder="Quantity" value="1" style="width: 100px; display: inline-block; margin-right: 10px;">
+    <button class="btn" onclick="addToCart()" style="width: auto; display: inline-block; padding: 12px 20px;">Add to Cart</button>
+</div>
+<div id="cartData" class="data-display hidden">
+    <h3 style="margin-bottom: 10px;">Cart Data</h3>
+    <pre id="cartJson"></pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadCart() {
+    const cartId = document.getElementById('cartId').value;
+    const url = cartId ? `/api/cart?cart_id=${cartId}` : '/api/cart';
+    const alertDiv = document.getElementById('alert');
+    const dataDiv = document.getElementById('cartData');
+    const jsonDiv = document.getElementById('cartJson');
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (response.ok) {
+            jsonDiv.textContent = JSON.stringify(data, null, 2);
+            dataDiv.classList.remove('hidden');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Cart loaded successfully${cartId ? ` (ID: ${cartId})` : ''}`;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to load cart';
+            dataDiv.classList.add('hidden');
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+        dataDiv.classList.add('hidden');
+    }
+}
+
+async function addToCart() {
+    const product = document.getElementById('productName').value;
+    const qty = parseInt(document.getElementById('productQty').value) || 1;
+    const alertDiv = document.getElementById('alert');
+    
+    if (!product) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Please enter a product name';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product, qty })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = data.message || 'Item added to cart';
+            loadCart();
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to add item';
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+window.onload = () => loadCart();
+</script>
+{% endblock %}
+

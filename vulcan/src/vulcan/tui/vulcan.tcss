@@ -1,0 +1,104 @@
+Screen {
+    align: center middle;
+}
+
+#main-container {
+    width: 100%;
+    height: 1fr;
+}
+
+#top-section {
+    height: 30%;
+    width: 100%;
+}
+
+#middle-section {
+    height: 35%;
+    width: 100%;
+}
+
+#bottom-section {
+    height: 35%;
+    width: 100%;
+}
+
+#button-bar {
+    height: 5%;
+    width: 100%;
+    dock: bottom;
+    padding: 0 1;
+}
+
+#left-panel {
+    width: 30%;
+    border: solid green;
+    padding: 1;
+}
+
+#right-panel {
+    width: 70%;
+    border: solid blue;
+    padding: 1;
+}
+
+#log-panel {
+    width: 50%;
+    border: solid yellow;
+    padding: 1;
+}
+
+#llm-panel {
+    width: 50%;
+    border: solid cyan;
+    padding: 1;
+}
+
+#details-panel {
+    width: 100%;
+    border: solid magenta;
+    padding: 1;
+}
+
+StatsPanel {
+    height: auto;
+    padding: 1;
+}
+
+VulnListPanel {
+    height: 100%;
+}
+
+RequestLogPanel {
+    height: 100%;
+}
+
+VulnDetailsPanel {
+    height: 100%;
+    padding: 1;
+}
+
+#stats-header, #vuln-header, #log-header, #details-header, #llm-header, #config-header {
+    background: $boost;
+    color: $text;
+    padding: 1;
+}
+
+ConfigSummaryPanel {
+    height: auto;
+    padding: 1;
+    border: solid cyan;
+}
+
+#help-text {
+    width: 80%;
+    height: auto;
+    padding: 2;
+    border: solid cyan;
+}
+
+#report-text {
+    width: 80%;
+    height: auto;
+    padding: 2;
+    border: solid green;
+}

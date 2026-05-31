@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Secrets / local config
+.env
+!.env.example
+config.yaml
+
+# Runtime artifacts
+data/
+logs/
+*.db
+*.log
+reports/full_validation_*.json
+reports/full_validation_*.md
+reports/vulcan_report_*.json
+reports/vulcan_report_*.md
+reports/vulcan_llm_report_*.md
+reports/validation_*.json
+reports/validation_*.txt
+reports/e2e_validation_*.json
+reports/real_validation_*.json
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store

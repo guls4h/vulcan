@@ -1,0 +1,57 @@
+[project]
+name = "vulcan"
+version = "0.1.0"
+description = "LLM-powered web vulnerability scanner using mitmproxy"
+authors = [{name = "Gulsah", email = "gulsah@example.com"}]
+requires-python = ">=3.11"
+dependencies = [
+    "agno>=0.1.0",
+    "mitmproxy>=10.2.0",
+    "textual>=0.50.0",
+    "click>=8.1.7",
+    "questionary>=2.0.1",
+    "pyyaml>=6.0.1",
+    "pymilvus[milvus-lite]>=2.3.6",
+    "openai>=1.12.0",
+    "pydantic>=2.6.0",
+    "sqlalchemy>=2.0.25",
+    "janus>=2.0.0",
+    "python-dotenv>=1.2.1",
+]
+
+[project.scripts]
+vulcan = "vulcan.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.12.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+log_level = "WARNING"
+
+[tool.coverage.run]
+source = ["src/vulcan/utils"]
+omit = ["*/__pycache__/*", "*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80

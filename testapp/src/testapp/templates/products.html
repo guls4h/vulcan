@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px; color: #333;">Products</h2>
+<div id="alert"></div>
+<button class="btn" onclick="loadProducts()" style="width: auto; margin-bottom: 20px;">Load All Products</button>
+<div id="productsList" class="hidden">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productsTableBody"></tbody>
+    </table>
+</div>
+<div id="productData" class="data-display hidden">
+    <h3 style="margin-bottom: 10px;">Product Details</h3>
+    <pre id="productJson"></pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadProducts() {
+    const alertDiv = document.getElementById('alert');
+    const listDiv = document.getElementById('productsList');
+    const tbody = document.getElementById('productsTableBody');
+    
+    try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        
+        if (response.ok) {
+            tbody.innerHTML = data.products.map(product => `
+                <tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>$${product.price}</td>
+                    <td><button class="btn" onclick="loadProduct(${product.id})" style="width: auto; padding: 8px 15px;">View Details</button></td>
+                </tr>
+            `).join('');
+            listDiv.classList.remove('hidden');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Loaded ${data.products.length} products`;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = 'Failed to load products';
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+async function loadProduct(productId) {
+    const alertDiv = document.getElementById('alert');
+    const dataDiv = document.getElementById('productData');
+    const jsonDiv = document.getElementById('productJson');
+    
+    try {
+        const response = await fetch(`/api/products/${productId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            jsonDiv.textContent = JSON.stringify(data, null, 2);
+            dataDiv.classList.remove('hidden');
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to load product';
+            dataDiv.classList.add('hidden');
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+        dataDiv.classList.add('hidden');
+    }
+}
+
+window.onload = () => loadProducts();
+</script>
+{% endblock %}
+

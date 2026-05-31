@@ -1,0 +1,80 @@
+provider: "openai"
+
+openai:
+  model: "gpt-4o-mini"
+  temperature: 0.2
+  embedding_model: "text-embedding-3-small"
+
+gemini:
+  model: "gemini-1.5-flash"
+  base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+
+database:
+  path: "./data/vulcan.db"
+
+milvus:
+  uri: "./data/milvus/milvus.db"
+  collection: "http_traffic"
+
+agent:
+  num_history_runs: 5
+  confidence_threshold: 90
+  top_k: 5
+  enable_agentic_memory: true
+  enable_user_memories: true
+  enable_session_summaries: true
+
+logging:
+  level: INFO  # DEBUG for development, INFO for production
+  log_dir: ./logs
+  max_size_mb: 10
+  backup_count: 5
+
+proxy:
+  port: 8080
+  mitm_addons: []
+
+pii_patterns:
+  - name: email
+    regex: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+    mask: "[EMAIL_REDACTED]"
+  - name: ssn
+    regex: "\\d{3}-\\d{2}-\\d{4}"
+    mask: "[SSN_REDACTED]"
+  - name: credit_card
+    regex: "\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}[\\s-]?\\d{4}"
+    mask: "[CARD_REDACTED]"
+  - name: api_key
+    regex: "(sk|pk|api)[-_]?[a-zA-Z0-9]{32,}"
+    mask: "[API_KEY_REDACTED]"
+  - name: jwt
+    regex: "eyJ[a-zA-Z0-9_-]*\\.eyJ[a-zA-Z0-9_-]*\\.[a-zA-Z0-9_-]*"
+    mask: "[JWT_REDACTED]"
+
+static_extensions:
+  - ".png"
+  - ".jpg"
+  - ".jpeg"
+  - ".gif"
+  - ".svg"
+  - ".ico"
+  - ".css"
+  - ".js"
+  - ".woff"
+  - ".woff2"
+  - ".ttf"
+  - ".eot"
+  - ".map"
+
+vulnerability_types:
+  - "IDOR"
+  - "Privilege Escalation"
+  - "Broken Access Control"
+  - "Insecure Direct Object Reference"
+  - "Horizontal Privilege Escalation"
+  - "Vertical Privilege Escalation"
+
+output:
+  report_format: "json"
+  log_directory: "./logs"
+  vulnerability_log: "./data/vulnerabilities.jsonl"

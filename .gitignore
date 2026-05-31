@@ -1,0 +1,79 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Tooling caches ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.hypothesis/
+
+# --- Secrets / local config ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Runtime data ---
+**/logs/
+**/data/milvus/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# --- Generated reports (timestamped) ---
+reports/*
+!reports/VERIFICATION_REPORT.md
+project_documents/
+vulcan/reports/full_validation_*.json
+vulcan/reports/full_validation_*.md
+vulcan/reports/vulcan_report_*.json
+vulcan/reports/vulcan_report_*.md
+vulcan/reports/vulcan_llm_report_*.md
+vulcan/reports/validation_*.json
+vulcan/reports/validation_*.txt
+vulcan/reports/e2e_validation_*.json
+vulcan/reports/real_validation_*.json
+
+# vulnerabilities log produced at scan time
+vulcan/data/vulnerabilities.jsonl
+
+# testapp runtime ground-truth log (regenerated each run)
+testapp/src/testapp/ground_truth.jsonl
+
+# --- Local user config (keep config.example.yaml as template) ---
+vulcan/config.yaml
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Memory / agent transcripts ---
+.copilot/
+.aider*

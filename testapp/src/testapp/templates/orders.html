@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px; color: #333;">Orders</h2>
+<div id="alert"></div>
+<div class="form-group">
+    <label>View Order by ID (IDOR Test)</label>
+    <input type="text" id="orderId" placeholder="Enter order ID (1-5)" style="width: 200px; display: inline-block; margin-right: 10px;">
+    <button class="btn" onclick="loadOrder()" style="width: auto; display: inline-block; padding: 12px 20px;">Load Order</button>
+    <button class="btn" onclick="loadAllOrders()" style="width: auto; display: inline-block; padding: 12px 20px; background: #28a745;">My Orders</button>
+</div>
+<div id="orderData" class="data-display hidden">
+    <h3 style="margin-bottom: 10px;">Order Data</h3>
+    <pre id="orderJson"></pre>
+    <button class="btn btn-danger" onclick="deleteOrder()" style="width: auto; margin-top: 10px;">Delete Order</button>
+</div>
+<div id="ordersList" class="hidden">
+    <h3 style="margin-bottom: 10px;">All My Orders</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>User ID</th>
+            </tr>
+        </thead>
+        <tbody id="ordersTableBody"></tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentOrderId = null;
+
+async function loadOrder() {
+    const orderId = document.getElementById('orderId').value;
+    if (!orderId) {
+        document.getElementById('alert').className = 'alert alert-error';
+        document.getElementById('alert').textContent = 'Please enter an order ID';
+        return;
+    }
+    
+    currentOrderId = orderId;
+    const alertDiv = document.getElementById('alert');
+    const dataDiv = document.getElementById('orderData');
+    const jsonDiv = document.getElementById('orderJson');
+    const listDiv = document.getElementById('ordersList');
+    
+    try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            jsonDiv.textContent = JSON.stringify(data, null, 2);
+            dataDiv.classList.remove('hidden');
+            listDiv.classList.add('hidden');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Order ${orderId} loaded`;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to load order';
+            dataDiv.classList.add('hidden');
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+        dataDiv.classList.add('hidden');
+    }
+}
+
+async function loadAllOrders() {
+    const alertDiv = document.getElementById('alert');
+    const dataDiv = document.getElementById('orderData');
+    const listDiv = document.getElementById('ordersList');
+    const tbody = document.getElementById('ordersTableBody');
+    
+    try {
+        const response = await fetch('/api/orders');
+        const data = await response.json();
+        
+        if (response.ok) {
+            tbody.innerHTML = data.orders.map(order => `
+                <tr>
+                    <td>${order.order_id}</td>
+                    <td>${order.product}</td>
+                    <td>$${order.price}</td>
+                    <td><span class="badge badge-${order.status === 'delivered' ? 'success' : order.status === 'shipped' ? 'warning' : 'danger'}">${order.status}</span></td>
+                    <td>${order.user_id}</td>
+                </tr>
+            `).join('');
+            listDiv.classList.remove('hidden');
+            dataDiv.classList.add('hidden');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Loaded ${data.orders.length} orders`;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to load orders';
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+    }
+}
+
+async function deleteOrder() {
+    if (!currentOrderId) return;
+    
+    if (!confirm(`Delete order ${currentOrderId}?`)) return;
+    
+    try {
+        const response = await fetch(`/api/orders/${currentOrderId}`, { method: 'DELETE' });
+        const data = await response.json();
+        
+        const alertDiv = document.getElementById('alert');
+        if (response.ok) {
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = data.message || 'Order deleted';
+            document.getElementById('orderData').classList.add('hidden');
+            currentOrderId = null;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to delete order';
+        }
+    } catch (error) {
+        document.getElementById('alert').className = 'alert alert-error';
+        document.getElementById('alert').textContent = 'Error: ' + error.message;
+    }
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-form">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Login</h2>
+    <div id="alert"></div>
+    <form id="loginForm" onsubmit="login(event)">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" required placeholder="alice, bob, charlie, or admin">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" required placeholder="password123, password456, etc.">
+        </div>
+        <button type="submit" class="btn">Login</button>
+    </form>
+    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+        <h3 style="margin-bottom: 15px; color: #333;">Test Users</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="padding: 5px 0;"><strong>alice</strong> - password: password123 (user, ID: 1)</li>
+            <li style="padding: 5px 0;"><strong>bob</strong> - password: password456 (user, ID: 2)</li>
+            <li style="padding: 5px 0;"><strong>charlie</strong> - password: password789 (user, ID: 3)</li>
+            <li style="padding: 5px 0;"><strong>admin</strong> - password: admin123 (admin, ID: 4)</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function login(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const alertDiv = document.getElementById('alert');
+    
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Login successful! Welcome ${data.username} (${data.role})`;
+            setTimeout(() => {
+                window.location.href = '/profile';
+            }, 1000);
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.message || 'Login failed';
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+    }
+}
+</script>
+{% endblock %}
+

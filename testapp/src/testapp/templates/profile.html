@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px; color: #333;">User Profile</h2>
+<div id="alert"></div>
+<div class="form-group">
+    <label>View Profile by ID (IDOR Test)</label>
+    <input type="text" id="profileId" placeholder="Enter user ID (default: your own)" style="width: 200px; display: inline-block; margin-right: 10px;">
+    <button class="btn" onclick="loadProfile()" style="width: auto; display: inline-block; padding: 12px 20px;">Load Profile</button>
+</div>
+<div id="profileData" class="data-display hidden">
+    <h3 style="margin-bottom: 10px;">Profile Data</h3>
+    <pre id="profileJson"></pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadProfile() {
+    const profileId = document.getElementById('profileId').value;
+    const url = profileId ? `/api/profile?id=${profileId}` : '/api/profile';
+    const alertDiv = document.getElementById('alert');
+    const dataDiv = document.getElementById('profileData');
+    const jsonDiv = document.getElementById('profileJson');
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (response.ok) {
+            jsonDiv.textContent = JSON.stringify(data, null, 2);
+            dataDiv.classList.remove('hidden');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Profile loaded successfully${profileId ? ` (ID: ${profileId})` : ''}`;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to load profile';
+            dataDiv.classList.add('hidden');
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+        dataDiv.classList.add('hidden');
+    }
+}
+window.onload = () => loadProfile();
+</script>
+{% endblock %}
+

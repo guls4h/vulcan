@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px; color: #333;">Admin Panel (Privilege Escalation Test)</h2>
+<div id="alert"></div>
+<div class="alert alert-info">
+    <strong>Note:</strong> This endpoint requires admin role. Regular users should not be able to access this.
+</div>
+<button class="btn" onclick="loadAllUsers()" style="width: auto; margin-bottom: 20px;">List All Users</button>
+<div id="usersList" class="hidden">
+    <h3 style="margin-bottom: 10px;">All Users</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadAllUsers() {
+    const alertDiv = document.getElementById('alert');
+    const listDiv = document.getElementById('usersList');
+    const tbody = document.getElementById('usersTableBody');
+    
+    try {
+        const response = await fetch('/api/admin/users');
+        const data = await response.json();
+        
+        if (response.ok) {
+            tbody.innerHTML = Object.entries(data.users).map(([id, user]) => `
+                <tr>
+                    <td>${user.user_id}</td>
+                    <td>${user.username}</td>
+                    <td><span class="badge badge-${user.role === 'admin' ? 'danger' : 'success'}">${user.role}</span></td>
+                    <td><button class="btn btn-danger" onclick="deleteUser('${user.user_id}')" style="width: auto; padding: 8px 15px;">Delete</button></td>
+                </tr>
+            `).join('');
+            listDiv.classList.remove('hidden');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = `Loaded ${Object.keys(data.users).length} users`;
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Access denied. Admin role required.';
+            listDiv.classList.add('hidden');
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Error: ' + error.message;
+        listDiv.classList.add('hidden');
+    }
+}
+
+async function deleteUser(userId) {
+    if (!confirm(`Delete user ${userId}?`)) return;
+    
+    try {
+        const response = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+        const data = await response.json();
+        
+        const alertDiv = document.getElementById('alert');
+        if (response.ok) {
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = data.message || 'User deleted';
+            loadAllUsers();
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.error || 'Failed to delete user';
+        }
+    } catch (error) {
+        document.getElementById('alert').className = 'alert alert-error';
+        document.getElementById('alert').textContent = 'Error: ' + error.message;
+    }
+}
+</script>
+{% endblock %}
+
